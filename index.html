@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compressor Performance Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon">⚙️</span>
+                <div>
+                    <h1>Compressor Performance Analyzer</h1>
+                    <span class="subtitle">Multi-stage Air Compressor Simulation</span>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span class="badge status">Thermodynamic Analysis Tool</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="app-body">
+        <nav class="sidebar">
+            <ul>
+                <li class="active" data-section="inputs"><span class="icon">📋</span> Input Parameters</li>
+                <li data-section="atmospheric"><span class="icon">🌡️</span> Atmospheric</li>
+                <li data-section="stages"><span class="icon">📊</span> Stage Configuration</li>
+                <li data-section="results"><span class="icon">📈</span> Results</li>
+                <li data-section="optimization"><span class="icon">🤖</span> AI Optimization</li>
+                <li data-section="charts"><span class="icon">📉</span> Charts</li>
+                <li data-section="pv"><span class="icon">📐</span> P-V & T-S</li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="inputs" class="section active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📋 Input Parameters</h2>
+                        <span class="badge step">Step 1</span>
+                    </div>
+                    <div class="grid grid-3">
+                        <div class="input-group">
+                            <label>Number of Stages</label>
+                            <input type="number" id="stageCount" min="1" max="20" value="5" />
+                            <span class="hint">1-20 stages</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Relative Humidity <span class="required">*</span></label>
+                            <input type="number" id="humidity" step="0.1" value="60" />
+                            <span class="hint">0-100%</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Atmospheric Pressure <span class="required">*</span></label>
+                            <input type="number" id="pressure" step="0.0001" value="0.9932" />
+                            <span class="hint">bar</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Atmospheric Temperature <span class="required">*</span></label>
+                            <input type="number" id="temperature" step="0.1" value="34" />
+                            <span class="hint">°C</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Air Flow <span class="required">*</span></label>
+                            <input type="number" id="airFlow" step="0.1" value="1000" />
+                            <span class="hint">kg/hr</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Specific Heat Ratio (k)</label>
+                            <input type="number" id="specificHeatRatio" step="0.001" value="1.4" />
+                            <span class="hint">dimensionless</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Gas Constant</label>
+                            <input type="number" id="gasConstant" step="0.001" value="0.287" />
+                            <span class="hint">kJ/kg·K</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Intercooler Efficiency</label>
+                            <input type="number" id="intercoolerEfficiency" step="0.01" value="0.85" />
+                            <span class="hint">0-1</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Compression Type</label>
+                            <select id="compressionType">
+                                <option value="polytropic">Polytropic</option>
+                                <option value="isentropic">Isentropic</option>
+                                <option value="isothermal">Isothermal</option>
+                            </select>
+                            <span class="hint">Select compression model</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Mechanical Efficiency</label>
+                            <input type="number" id="mechEfficiency" step="0.01" value="0.95" />
+                            <span class="hint">0-1</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Motor Efficiency</label>
+                            <input type="number" id="motorEfficiency" step="0.01" value="0.92" />
+                            <span class="hint">0-1</span>
+                        </div>
+                        <div class="input-group">
+                            <label>Intercooler Pressure Loss</label>
+                            <input type="number" id="pressureLoss" step="0.001" value="0.02" />
+                            <span class="hint">bar</span>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top:16px; padding:16px; background: var(--bg-input); border:1px solid var(--border-color);">
+                        <div class="card-header">
+                            <h3 style="font-size:13px; color:var(--text-secondary);">💰 Energy & Cost Parameters</h3>
+                        </div>
+                        <div class="grid grid-3">
+                            <div class="input-group">
+                                <label>Annual Operating Hours</label>
+                                <input type="number" id="operatingHours" step="100" value="8000" />
+                                <span class="hint">hours/year</span>
+                            </div>
+                            <div class="input-group">
+                                <label>Electricity Tariff</label>
+                                <input type="number" id="electricityTariff" step="0.5" value="7.5" />
+                                <span class="hint">₹/kWh</span>
+                            </div>
+                            <div class="input-group">
+                                <label>Currency</label>
+                                <select id="currency">
+                                    <option value="₹">₹ (INR)</option>
+                                    <option value="$">$ (USD)</option>
+                                    <option value="€">€ (EUR)</option>
+                                    <option value="£">£ (GBP)</option>
+                                </select>
+                                <span class="hint">Select currency</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <button class="btn primary" id="generateBtn"><span class="icon">➕</span> Generate Stages</button>
+                        <button class="btn warning" id="autoFillBtn"><span class="icon">🎲</span> Auto-Fill</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="atmospheric" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🌡️ Atmospheric Properties</h2>
+                        <span class="badge step">Step 2</span>
+                    </div>
+                    <div class="kpi-grid">
+                        <div class="kpi-item">
+                            <span class="kpi-label">Relative Humidity</span>
+                            <span class="kpi-value" id="displayHumidity">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Atmospheric Pressure</span>
+                            <span class="kpi-value" id="displayPressure">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Atmospheric Temperature</span>
+                            <span class="kpi-value" id="displayTemperature">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Air Flow</span>
+                            <span class="kpi-value" id="displayAirFlow">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Dew Point</span>
+                            <span class="kpi-value cyan" id="displayDewPoint">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Wet Bulb</span>
+                            <span class="kpi-value purple" id="displayWetBulb">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💧 Psychrometric Properties</h3>
+                    </div>
+                    <div class="kpi-grid">
+                        <div class="kpi-item">
+                            <span class="kpi-label">Saturation Pressure</span>
+                            <span class="kpi-value" id="displaySatPressure">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Vapor Pressure</span>
+                            <span class="kpi-value" id="displayVaporPressure">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Humidity Ratio</span>
+                            <span class="kpi-value" id="displayHumidityRatio">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Mole Fraction</span>
+                            <span class="kpi-value" id="displayMoleFraction">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Density</span>
+                            <span class="kpi-value" id="displayDensity">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Specific Volume</span>
+                            <span class="kpi-value" id="displaySpecificVolume">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Absolute Humidity</span>
+                            <span class="kpi-value pink" id="displayAbsoluteHumidity">-</span>
+                        </div>
+                        <div class="kpi-item">
+                            <span class="kpi-label">Enthalpy</span>
+                            <span class="kpi-value indigo" id="displayEnthalpy">-</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="stages" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📊 Stage Configuration</h2>
+                        <span class="badge step">Step 3</span>
+                    </div>
+                    <div id="stageContainer">
+                        <div class="empty-state">
+                            <span class="empty-icon">📋</span>
+                            <h3>No Stages Generated</h3>
+                            <p>Click "Generate Stages" to create input cards</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="results" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📈 Simulation Results</h2>
+                        <span class="badge step">Step 4</span>
+                        <div class="header-actions">
+                            <button class="btn small secondary" id="exportBtn">📄 Export</button>
+                            <button class="btn small secondary" id="exportCSVBtn">📊 CSV</button>
+                            <button class="btn small secondary" id="exportPDFBtn">📕 PDF</button>
+                            <button class="btn small secondary" id="compareBtn">📊 Compare</button>
+                            <button class="btn small danger" id="clearBtn">🗑️ Clear</button>
+                        </div>
+                    </div>
+                    <div id="resultsContainer">
+                        <div class="empty-state">
+                            <span class="empty-icon">🔬</span>
+                            <h3>No Results</h3>
+                            <p>Run the simulation to see results</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="optimization" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>🤖 AI Optimization & Analysis</h2>
+                        <span class="badge step">Advanced</span>
+                    </div>
+                    <div id="optimizationContainer">
+                        <div class="empty-state">
+                            <span class="empty-icon">🤖</span>
+                            <h3>Run Simulation First</h3>
+                            <p>AI recommendations will appear after simulation</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="charts" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📉 Performance Charts</h2>
+                        <span class="badge step">Visual</span>
+                        <div class="header-actions">
+                            <button class="btn small secondary" id="exportChartsBtn">📄 Export Charts</button>
+                        </div>
+                    </div>
+                    <div id="chartsContainer">
+                        <div class="chart-grid">
+                            <div class="chart-wrapper"><canvas id="pressureChart"></canvas></div>
+                            <div class="chart-wrapper"><canvas id="temperatureChart"></canvas></div>
+                            <div class="chart-wrapper"><canvas id="powerChart"></canvas></div>
+                            <div class="chart-wrapper"><canvas id="efficiencyChart"></canvas></div>
+                            <div class="chart-wrapper"><canvas id="humidityChart"></canvas></div>
+                            <div class="chart-wrapper"><canvas id="condensationChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="pv" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>📐 P-V & T-S Diagrams</h2>
+                        <span class="badge step">Advanced</span>
+                    </div>
+                    <div class="chart-grid-3">
+                        <div class="chart-wrapper"><canvas id="pvChart"></canvas></div>
+                        <div class="chart-wrapper"><canvas id="tsChart"></canvas></div>
+                        <div class="chart-wrapper"><canvas id="compressorMapChart"></canvas></div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="action-bar">
+                <button class="btn success large" id="calculateBtn"><span class="icon">🚀</span> Run Simulation</button>
+                <button class="btn warning large" id="autoRunBtn"><span class="icon">🎲</span> Auto-Fill & Run</button>
+                <button class="btn secondary large" id="saveProjectBtn"><span class="icon">💾</span> Save Project</button>
+                <button class="btn secondary large" id="loadProjectBtn"><span class="icon">📂</span> Load Project</button>
+                <button class="btn secondary" id="themeToggle"><span class="icon">🌓</span> Theme</button>
+            </div>
+
+            <div id="progressContainer" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-status" id="progressStatus">Initializing...</div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
