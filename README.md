@@ -3,7 +3,6 @@
 [![Status](https://img.shields.io/badge/status-active%20development-brightgreen.svg)](https://github.com/MrRogueKnight/Compressor-Performance-Analyzer)
 [![Version](https://img.shields.io/badge/version-v1.0.0-blue.svg)](https://github.com/MrRogueKnight/Compressor-Performance-Analyzer/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Language](https://img.shields.io/badge/language-JavaScript-ES6%2B-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/MrRogueKnight/Compressor-Performance-Analyzer/graphs/commit-activity)
 [![GitHub issues](https://img.shields.io/github/issues/MrRogueKnight/Compressor-Performance-Analyzer.svg)](https://github.com/MrRogueKnight/Compressor-Performance-Analyzer/issues)
